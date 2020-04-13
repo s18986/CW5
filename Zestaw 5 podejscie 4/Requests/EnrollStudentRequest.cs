@@ -19,5 +19,6 @@ namespace Zestaw_5_podejscie_4.Requests
         [Required]
         public string Studies { get; set; }
         public int Semester { get; set; }
+        public int IdEnrollment { get; set; }
     }
 }

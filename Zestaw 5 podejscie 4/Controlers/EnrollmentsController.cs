@@ -12,13 +12,17 @@ using Zestaw_5_podejscie_4.Response;
 
 namespace Zestaw_5_podejscie_4.Controlers
 {
-    [Route("api/[controller]")]
+    [Route("api/enrollments")]
     [ApiController]
     public class EnrollmentsController : ControllerBase
     {
         [HttpPost]
         public IActionResult EnrollStudent(EnrollStudentRequest request)
         {
+            if(!ModelState.IsValid)
+            {
+                var d = ModelState;
+            }
             Student st = new Student();
             st.FirstName = request.FirstName;
 
@@ -28,25 +32,39 @@ namespace Zestaw_5_podejscie_4.Controlers
             response.StartDate = request.Birthdate;
             response.Semester = 1;
 
-           
-            using (var con = new SqlConnection())
-            using (var com = new SqlCommand())
+
+            using (SqlConnection con = new SqlConnection("Data Source=db-mssql;Initial Catalog=s18986;Integrated Security=True"))
+            using (SqlCommand com = new SqlCommand())
             {
                 com.Connection = con;
                 con.Open();
-                var tran = con.BeginTransaction();
-                //1.Studia
-                com.CommandText = "Select  IdStudy from Studies where Name=@name";
+                //var Tran = con.BeginTransaction();
+                //1. Walidacja Studiow
+                com.CommandText = "select IdStudy from dbo.Studies where Name=@name";
                 com.Parameters.AddWithValue("name", request.Studies);
-                var reader = com.ExecuteReader();
-                com.Parameters.Clear();
-                if (!reader.HasRows)
+                var dr = com.ExecuteReader();
+                if(!dr.Read())
                 {
-                    reader.Close();
-                    tran.Rollback();
+                 //   Tran.Rollback();
                     return BadRequest("Nie ma takich studiow");
                 }
-            }
+                int IdStudies =(int)dr["IdStudy"];
+                dr.Close();
+                //2. dodanie studenta
+                com.CommandText = "insert into Student(IndexNumber, FirstName, LastName, BirthDate, IdEnrollment) "
+                                      + "values (@indexnumber, @firstname, @lastname, @birthdate, @idenrollment)";
+                com.Parameters.AddWithValue("indexnumber", request.IndexNumber);
+                com.Parameters.AddWithValue("firstname", request.FirstName);
+                com.Parameters.AddWithValue("lastname", request.LastName);
+                com.Parameters.AddWithValue("birthdate", request.Birthdate);
+                com.Parameters.AddWithValue("idenrollment", 1);
+
+                com.ExecuteNonQuery();
+                //Tran.Commit();
+                
+
+            };
+            // con.Dispose();
 
             return Ok(response);
         }
