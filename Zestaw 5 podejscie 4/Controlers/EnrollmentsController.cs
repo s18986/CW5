@@ -9,12 +9,14 @@ using Microsoft.AspNetCore.Mvc;
 using Zestaw_5_podejscie_4.Models;
 using Zestaw_5_podejscie_4.Requests;
 using Zestaw_5_podejscie_4.Response;
+using Zestaw_5_podejscie_4.Services;
 
 namespace Zestaw_5_podejscie_4.Controlers
 {
     [Route("api/enrollments")]
     [ApiController]
     public class EnrollmentsController : ControllerBase
+        private SqlStudentServerDbServicecs _service = new SqlStudentServerDbServices();
     {
         [HttpPost]
         public IActionResult EnrollStudent(EnrollStudentRequest request)
@@ -30,43 +32,33 @@ namespace Zestaw_5_podejscie_4.Controlers
             response.LastName = request.LastName;
             response.Semester = request.Semester;
             response.StartDate = request.Birthdate;
+            response.FirstName = request.FirstName;
+            response.Studies = request.Studies;
+            response.IndexNumber = request.IndexNumber;
             response.Semester = 1;
+        _service
 
 
-            using (SqlConnection con = new SqlConnection("Data Source=db-mssql;Initial Catalog=s18986;Integrated Security=True"))
-            using (SqlCommand com = new SqlCommand())
-            {
-                com.Connection = con;
-                con.Open();
-                //var Tran = con.BeginTransaction();
-                //1. Walidacja Studiow
-                com.CommandText = "select IdStudy from dbo.Studies where Name=@name";
-                com.Parameters.AddWithValue("name", request.Studies);
-                var dr = com.ExecuteReader();
-                if(!dr.Read())
-                {
-                 //   Tran.Rollback();
-                    return BadRequest("Nie ma takich studiow");
-                }
-                int IdStudies =(int)dr["IdStudy"];
-                dr.Close();
-                //2. dodanie studenta
-                com.CommandText = "insert into Student(IndexNumber, FirstName, LastName, BirthDate, IdEnrollment) "
-                                      + "values (@indexnumber, @firstname, @lastname, @birthdate, @idenrollment)";
-                com.Parameters.AddWithValue("indexnumber", request.IndexNumber);
-                com.Parameters.AddWithValue("firstname", request.FirstName);
-                com.Parameters.AddWithValue("lastname", request.LastName);
-                com.Parameters.AddWithValue("birthdate", request.Birthdate);
-                com.Parameters.AddWithValue("idenrollment", 1);
-
-                com.ExecuteNonQuery();
-                //Tran.Commit();
-                
-
-            };
             // con.Dispose();
 
-            return Ok(response);
+        return Ok(response);
+        }
+        [Route("api/enrollments/promotions")]
+        [HttpPost]
+        public IActionResult promote(PromoteStudentRequest request)
+        {
+            if (!ModelState.IsValid)
+            {
+                var d = ModelState;
+            }
+            Student st = new Student();
+            st.FirstName = "Michał";
+            st.LastName = "Kozak";
+            st.Semester = 1;
+            st.Studies = "Informatyka";
+            st.IndexNumber = "s19084";
+            st.Birthdate =DateTime.Now;
+            return Ok(st);
         }
     }
 }
