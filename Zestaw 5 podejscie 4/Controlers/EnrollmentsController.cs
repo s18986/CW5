@@ -9,22 +9,18 @@ using Microsoft.AspNetCore.Mvc;
 using Zestaw_5_podejscie_4.Models;
 using Zestaw_5_podejscie_4.Requests;
 using Zestaw_5_podejscie_4.Response;
-using Zestaw_5_podejscie_4.Services;
 
 namespace Zestaw_5_podejscie_4.Controlers
 {
-    [Route("api/enrollments")]
+    [Route("api/[controller]")]
     [ApiController]
     public class EnrollmentsController : ControllerBase
-        private SqlStudentServerDbServicecs _service = new SqlStudentServerDbServices();
     {
         [HttpPost]
         public IActionResult EnrollStudent(EnrollStudentRequest request)
         {
-            if(!ModelState.IsValid)
-            {
-                var d = ModelState;
-            }
+
+            string ConString = "Data Source=db-mssql;Initial Catalog=s18986;Integrated Security=True";
             Student st = new Student();
             st.FirstName = request.FirstName;
 
@@ -32,33 +28,51 @@ namespace Zestaw_5_podejscie_4.Controlers
             response.LastName = request.LastName;
             response.Semester = request.Semester;
             response.StartDate = request.Birthdate;
-            response.FirstName = request.FirstName;
-            response.Studies = request.Studies;
-            response.IndexNumber = request.IndexNumber;
             response.Semester = 1;
-        _service
-
-
-            // con.Dispose();
-
-        return Ok(response);
-        }
-        [Route("api/enrollments/promotions")]
-        [HttpPost]
-        public IActionResult promote(PromoteStudentRequest request)
-        {
-            if (!ModelState.IsValid)
+            
+           
+            using (var con = new SqlConnection(ConString))
+            using (var com = new SqlCommand())
             {
-                var d = ModelState;
+                com.Connection = con;
+                con.Open();
+                var tran = con.BeginTransaction();
+                try
+                {
+                    //1.Studia
+                    
+                    var reader = com.ExecuteReader();
+                    if (!reader.HasRows)
+                    {
+
+                        tran.Rollback();
+                        return BadRequest("Nie ma takich studiow");
+                    }
+                    int idstudiow = (int)reader["IdStudy"];
+                    reader.Close();
+                    Console.WriteLine(idstudiow);
+                    
+                    com.CommandText = "insert into Student(IndexNumber, FirstName, LastName, BirthDate, IdEnrollment) "
+                                          + "values (@indexnumber, @firstname, @lastname, @birthdate, @idenrollment)";
+                    com.Parameters.AddWithValue("indexnumber", request.IndexNumber);
+                    com.Parameters.AddWithValue("firstname", request.FirstName);
+                    com.Parameters.AddWithValue("lastname", request.LastName);
+                    com.Parameters.AddWithValue("birthdate", request.Birthdate);
+                    com.Parameters.AddWithValue("idenrollment", 10);
+                    com.Parameters.Clear();
+
+
+                    com.ExecuteNonQuery();
+                    tran.Commit();
+                }catch(SqlException e )
+                {
+                    Console.WriteLine(e);
+                }
+                //reader.Close();
             }
-            Student st = new Student();
-            st.FirstName = "Michał";
-            st.LastName = "Kozak";
-            st.Semester = 1;
-            st.Studies = "Informatyka";
-            st.IndexNumber = "s19084";
-            st.Birthdate =DateTime.Now;
-            return Ok(st);
+            
+
+            return Ok(response);
         }
     }
 }

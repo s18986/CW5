@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Zestaw_5_podejscie_4.Requests
 {
-    public class EnrollStudentRequest
+    public class PromotionStudentRequest
     {
         [Required]
         public string IndexNumber { get; set; }
@@ -18,6 +18,7 @@ namespace Zestaw_5_podejscie_4.Requests
         public DateTime Birthdate { get; set; }
         [Required]
         public string Studies { get; set; }
+        [Required]
         public int Semester { get; set; }
     }
 }

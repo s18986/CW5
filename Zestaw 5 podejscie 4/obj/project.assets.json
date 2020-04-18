@@ -6513,11 +6513,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "C:\\Users\\Paweł\\Desktop\\CW5\\Zestaw 5 podejscie 4\\Zestaw 5 podejscie 4.csproj",
+      "projectUniqueName": "C:\\Users\\Paweł\\source\\repos\\Zestaw 5 podejscie 4\\Zestaw 5 podejscie 4.csproj",
       "projectName": "Zestaw 5 podejscie 4",
-      "projectPath": "C:\\Users\\Paweł\\Desktop\\CW5\\Zestaw 5 podejscie 4\\Zestaw 5 podejscie 4.csproj",
+      "projectPath": "C:\\Users\\Paweł\\source\\repos\\Zestaw 5 podejscie 4\\Zestaw 5 podejscie 4.csproj",
       "packagesPath": "C:\\Users\\Paweł\\.nuget\\packages\\",
-      "outputPath": "C:\\Users\\Paweł\\Desktop\\CW5\\Zestaw 5 podejscie 4\\obj\\",
+      "outputPath": "C:\\Users\\Paweł\\source\\repos\\Zestaw 5 podejscie 4\\obj\\",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "C:\\Users\\Paweł\\AppData\\Roaming\\NuGet\\NuGet.Config",
